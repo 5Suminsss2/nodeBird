@@ -6,7 +6,7 @@ export const initialState = {
         id: 1,
         nickname: "제로초",
       },
-      content: "첫 번째 게시글", // 앞 글자가 대문자인 이유 : 다른 정보들과 합쳐질 애들일 경우 이렇게 작성함
+      content: "첫 번째 게시글 #해시태그 #익스프레스", // 앞 글자가 대문자인 이유 : 다른 정보들과 합쳐질 애들일 경우 이렇게 작성함
       Images: [
         {
           src: "https://bookthumb-phinf.pstatic.net/cover/137/995/13799585.jpg?udate=20180726",
