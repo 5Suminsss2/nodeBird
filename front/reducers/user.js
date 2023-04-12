@@ -1,6 +1,6 @@
 export const initialState = {
   isLoggedIn: false,
-  user: null,
+  me: null,
   signUpData: {},
   loginData: {},
 };
@@ -27,13 +27,13 @@ const reducer = (state = initialState, action) => {
         // 새 객체 생성 === 다음 상태
         ...state, // 이전상태
         isLoggedIn: true, // 액션
-        user: action.data,
+        me: action.data,
       };
     case "LOG_OUT":
       return {
         ...state,
         isLoggedIn: false,
-        user: null,
+        me: null,
       };
 
     default:
