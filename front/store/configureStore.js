@@ -2,10 +2,7 @@ import { createWrapper } from "next-redux-wrapper";
 import { applyMiddleware, compose, createStore } from "redux";
 import reducer from "../reducers";
 import { composeWithDevTools } from "redux-devtools-extension";
-import thunkMiddleware from "redux-thunk";
-
-// thunk : 리덕스를 비동기로 실행할 수 있게 해주는 미들웨어
-// thunk 장점 : 하나의 비동기 액션 안에서 여러개의 동기 액션을 넣을 수 있음/  dispatch를 여러번 할 수 있음
+import createSagaMiddleware from "redux-saga";
 
 const loggerMiddleware =
   ({ dispatch, getState }) =>
@@ -16,13 +13,20 @@ const loggerMiddleware =
   };
 
 const configureStore = () => {
-  const middlewares = [thunkMiddleware, loggerMiddleware]; // 미들웨어 : 리덕스의 기능 향상시키기
+  const sagaMiddleware = createSagaMiddleware();
+  const middlewares = [sagaMiddleware, loggerMiddleware];
   const enhancer =
     process.env.NODE_ENV === "production"
       ? compose(applyMiddleware(...middlewares))
       : composeWithDevTools(applyMiddleware(...middlewares)); // redux dev tools와 연동하기
   const store = createStore(reducer, enhancer);
 
+  store.sagaTask = sagaMiddleware.run(rootSaga);
+
+  store.dispatch({
+    type: "CHANGE_NICKNAME",
+    data: "boogicho",
+  });
   return store;
 };
 
