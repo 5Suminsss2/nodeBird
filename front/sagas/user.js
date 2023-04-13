@@ -7,6 +7,18 @@ import {
   delay,
 } from "@redux-saga/core/effects"; // 사가의 effect
 
+import {
+  LOG_IN_FAILURE,
+  LOG_IN_REQUEST,
+  LOG_IN_SUCCESS,
+  LOG_OUT_FAILURE,
+  LOG_OUT_REQUEST,
+  LOG_OUT_SUCCESS,
+  SIGN_UP_FAILURE,
+  SIGN_UP_REQUEST,
+  SIGN_UP_SUCCESS,
+} from "../reducers/user";
+
 // 이 함수에선 별표 붙이지 않는다.
 function logInAPI(data) {
   return axios.post("/api/login", data);
@@ -36,13 +48,13 @@ function* logIn(action) {
       */
     yield put({
       // put : === dispatch 이 액션 객체를 디스패치 해라
-      type: "LOG_IN_SUCCESS",
+      type: LOG_IN_SUCCESS,
       data: action.data,
     });
   } catch (err) {
     yield put({
-      type: "LOG_IN_FAILURE",
-      data: err.response.data,
+      type: LOG_IN_FAILURE,
+      error: err.response.data,
     });
   }
 }
@@ -58,19 +70,41 @@ function* logOut(action) {
 
     yield put({
       // put : === dispatch 이 액션 객체를 디스패치 해라
-      type: "LOG_OUT_SUCCESS",
+      type: LOG_OUT_SUCCESS,
       data: action.data,
     });
   } catch (err) {
     yield put({
-      type: "LOG_OUT_FAILURE",
-      data: err.response.data,
+      type: LOG_OUT_FAILURE,
+      error: err.response.data,
+    });
+  }
+}
+
+function signUpAPI() {
+  return axios.post("/api/signup");
+}
+
+function* signUp(action) {
+  try {
+    yield delay(1000);
+    // const result = yield call(signUpAPI); // yield는 await과 비슷하다
+
+    yield put({
+      // put : === dispatch 이 액션 객체를 디스패치 해라
+      type: SIGN_UP_SUCCESS,
+      data: action.data,
+    });
+  } catch (err) {
+    yield put({
+      type: SIGN_UP_FAILURE,
+      error: err.response.data,
     });
   }
 }
 
 function* watchLogIn() {
-  yield takeLatest("LOG_IN_REQUEST", logIn); // take: 로그인이라는 액션이 실행될때까지 기다리겠다. -> LOG_IN이라는 액션이 실행되면 logIn이라는 함수를 실행시키겠다
+  yield takeLatest(LOG_IN_REQUEST, logIn); // take: 로그인이라는 액션이 실행될때까지 기다리겠다. -> LOG_IN이라는 액션이 실행되면 logIn이라는 함수를 실행시키겠다
   // login in request의 action 자체가 login 함수에 전달되어짐
 
   // yield take의 단점 : 한번 밖에 사용을 못함!!!! ==> 그래서 등장한 takeEvery : 여러번 사용 가능해진다~!
@@ -79,9 +113,13 @@ function* watchLogIn() {
 }
 
 function* watchLogOut() {
-  yield takeLatest("LOG_OUT_REQUEST", logOut);
+  yield takeLatest(LOG_OUT_REQUEST, logOut);
+}
+
+function* watchSignUp() {
+  yield takeLatest(SIGN_UP_REQUEST, signUp);
 }
 
 export default function* userSaga() {
-  yield all([fork(watchLogIn), fork(watchLogOut)]);
+  yield all([fork(watchLogIn), fork(watchLogOut), fork(watchSignUp)]);
 }

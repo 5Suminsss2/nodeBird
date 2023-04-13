@@ -24,7 +24,7 @@ const Global = createGlobalStyle`
 `;
 
 const AppLayout = ({ children }) => {
-  const { isLoggedIn } = useSelector((state) => state.user);
+  const { me, logInDone } = useSelector((state) => state.user);
 
   return (
     <div>
@@ -67,8 +67,8 @@ const AppLayout = ({ children }) => {
             - 합쳐서 24를 넘으면 다음 칸으로 이동
         */}
         <Col xs={24} md={6}>
-          {console.log("isLoggedIn : ", isLoggedIn)}
-          {isLoggedIn ? <UserProfile /> : <LoginForm />}
+          {console.log("isLoggedIn : ", logInDone)}
+          {me ? <UserProfile /> : <LoginForm />}
         </Col>
         <Col xs={24} md={12}>
           {children}
