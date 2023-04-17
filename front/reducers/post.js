@@ -1,5 +1,6 @@
 import produce from "immer"; // 자동으로 불변성 갖춰주는 라이브러리
 import shortId from "shortid";
+import faker from "@withshepherd/faker"; // 가상의 더미데이터 자동 생성 라이브러리
 
 export const initialState = {
   mainPosts: [
@@ -53,6 +54,33 @@ export const initialState = {
   addCommentDone: false,
   addCommentError: null,
 };
+
+initialState.mainPosts = initialState.mainPosts.concat(
+  Array(20)
+    .fill()
+    .map(() => ({
+      id: shortId.generate(),
+      User: {
+        id: shortId.generate(),
+        nickname: faker.name.findName(),
+      },
+      content: faker.lorem.paragraph(),
+      Images: [
+        {
+          src: faker.image.image(),
+        },
+      ],
+      Comments: [
+        {
+          User: {
+            id: shortId.generate(),
+            nickname: faker.name.findName(),
+          },
+          content: faker.lorem.sentence(),
+        },
+      ],
+    }))
+);
 
 // 비동기는 항상 세 쌍 씩 만들자
 export const ADD_POST_REQUEST = "ADD_POST_REQUEST";

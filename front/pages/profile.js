@@ -1,11 +1,25 @@
+import { useSelector } from "react-redux";
+import { useEffect } from "react";
+import Head from "next/head"; // 헤드 부분만 수정할 수 있도록 next에서 지원
+import Router from "next/router";
+
 import AppLayout from "../components/AppLayout";
 import NicknameEditForm from "../components/NicknameEditForm";
 import FollowList from "../components/FollowList";
-import Head from "next/head"; // 헤드 부분만 수정할 수 있도록 next에서 지원
-import { useSelector } from "react-redux";
 
 const Profile = () => {
   const { me } = useSelector((state) => state.user);
+
+  // 로그아웃 할 경우
+  useEffect(() => {
+    if (!(me && me.id)) {
+      Router.push("/");
+    }
+  });
+
+  if (!me) {
+    return null;
+  }
   return (
     <>
       <Head>
