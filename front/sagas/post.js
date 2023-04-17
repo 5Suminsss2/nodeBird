@@ -6,6 +6,7 @@ import {
   put,
   takeLatest,
   delay,
+  throttle,
 } from "@redux-saga/core/effects"; // 사가의 effect
 
 import {
@@ -25,6 +26,27 @@ import {
 } from "../reducers/post";
 import { ADD_POST_TO_ME, REMOVE_POST_OF_ME } from "../reducers/user";
 import shortId from "shortid";
+
+function loadPostAPI(data) {
+  return axios.post("/api/posts", data);
+}
+
+function* loadPosts(action) {
+  try {
+    // const result = yield call(loadPostsAPI, action.data);
+    yield delay(1000);
+    yield put({
+      type: LOAD_POSTS_SUCCESS,
+      data: generateDummyPost(10),
+    });
+  } catch (err) {
+    console.error(err);
+    yield put({
+      type: LOAD_POSTS_FAILURE,
+      data: err.response.data,
+    });
+  }
+}
 
 function addPostAPI(data) {
   return axios.post("/api/addPost", data);
@@ -111,6 +133,12 @@ function* addComment(action) {
   }
 }
 
+function* watchLoadPosts() {
+  yield throttle(5000, LOAD_POSTS_REQUEST, loadPosts);
+  // 스크롤은 무수히 많은 리퀘스트를 쏟아내서 throttle로 5초 후에 발생시키게 하는데 문제는 다른 액션들을 취소하지 않는다는 것
+  // 이 문제를 해결하기 위해 loading을 사용하자 (pages에 index 에 가보자)
+}
+
 function* watchAddPost() {
   yield takeLatest(ADD_POST_REQUEST, addPost);
 }
@@ -124,5 +152,10 @@ function* watchRemovePost() {
 }
 
 export default function* postSaga() {
-  yield all([fork(watchAddPost), fork(watchAddComment), fork(watchRemovePost)]);
+  yield all([
+    fork(watchAddPost),
+    fork(watchLoadPosts),
+    fork(watchRemovePost),
+    fork(watchAddComment),
+  ]);
 }
