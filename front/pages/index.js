@@ -8,14 +8,16 @@ import { useEffect } from "react";
 const Home = () => {
   const dispatch = useDispatch();
   const { me } = useSelector((state) => state.user);
-  const { mainPosts, hasMorePost } = useSelector((state) => state.post);
+  const { mainPosts, hasMorePosts, loadPostsLoading } = useSelector(
+    (state) => state.post
+  );
 
   // 처음 들어왔을 때 포스트 로드하기
   useEffect(() => {
     dispatch({
       type: LOAD_POSTS_REQUEST,
     });
-  });
+  }, []);
 
   // 스크롤 내려서 끝까지 갔을 때 다시 로드하기
   // scrollY: 얼마나 내렸는지
@@ -27,13 +29,18 @@ const Home = () => {
         window.scrollY + document.documentElement.clientHeight >
         document.documentElement.scrollHeight - 300
       ) {
+        console.log("success2", hasMorePosts, loadPostsLoading);
         // 로딩중일 때는 실행 x -> 로딩 끝나면 실행 o
-        if (hasMorePost && !loadPostsLoading) {
+        if (hasMorePosts && !loadPostsLoading) {
           dispatch({
             type: LOAD_POSTS_REQUEST,
             data: mainPosts[mainPosts.length - 1].id,
           });
+
+          console.log("success");
         }
+      } else {
+        console.log("failed");
       }
     }
     window.addEventListener("scroll", onScroll);
@@ -41,7 +48,7 @@ const Home = () => {
       // window.addEventListener할 때 항상 리턴하고 remove해야지 메모리에 안 쌓임
       window.removeEventListener("scroll", onScroll);
     };
-  });
+  }, [mainPosts, hasMorePosts, loadPostsLoading]);
 
   return (
     <AppLayout>
